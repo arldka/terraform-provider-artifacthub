@@ -1,3 +1,5 @@
+name: acceptance_tests
+
 on:
   push:
     branches:
