@@ -13,7 +13,9 @@ func Provider() *schema.Provider {
 				DefaultFunc: schema.EnvDefaultFunc("ARTIFACTHUB_API_KEY", nil),
 			},
 		},
-		ResourcesMap:   map[string]*schema.Resource{},
-		DataSourcesMap: map[string]*schema.Resource{},
+		ResourcesMap: map[string]*schema.Resource{},
+		DataSourcesMap: map[string]*schema.Resource{
+			"artifacthub_helm_package": dataSourceHelmPackage(),
+		},
 	}
 }
