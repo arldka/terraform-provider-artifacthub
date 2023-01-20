@@ -5,6 +5,11 @@
 *.so
 *.dylib
 
+# Ignore Terraform related files
+
+.terraform/*
+.terraform.lock.hcl
+
 # Test binary, built with `go test -c`
 *.test
 
