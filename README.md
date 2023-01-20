@@ -1,1 +1,1 @@
-# terraform-provider-artifacthub
+# Artifacthub Terraform Provider
