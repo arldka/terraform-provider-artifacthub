@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -65,17 +64,12 @@ func resourceUserWebhook() *schema.Resource {
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"package_id": &schema.Schema{
+						"package_id": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
 				},
-			},
-			"webhook_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
 			},
 		},
 	}
@@ -108,7 +102,7 @@ func resourceUserWebhookCreate(ctx context.Context, d *schema.ResourceData, m in
 
 	data, _ := json.Marshal(webhookData)
 
-	req, err = http.NewRequest("POST", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user"), bytes.NewBuffer(data))
+	req, err = http.NewRequest("POST", "https://artifacthub.io/api/v1/webhooks/user", bytes.NewBuffer(data))
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -138,10 +132,48 @@ func resourceUserWebhookCreate(ctx context.Context, d *schema.ResourceData, m in
 		return diags
 	}
 
-	d.Set("package_id", resp[""])
+	verifResp := make([]map[string]interface{}, 0)
 
-	// always run
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	verifReq, err := http.NewRequest("GET", "https://artifacthub.io/api/v1/webhooks/user", nil)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	verifReq.Header.Add("X-API-KEY-ID", d.Get("api_key").(string))
+	verifReq.Header.Add("X-API-KEY-SECRET", d.Get("api_key_secret").(string))
+
+	verifR, err := client.Do(verifReq)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	defer verifR.Body.Close()
+
+	err = json.NewDecoder(verifR.Body).Decode(&verifResp)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	for _, wb := range verifResp {
+		if wb["name"].(string) != d.Get("string").(string) {
+			continue
+		} else if wb["url"].(string) != d.Get("url").(string) {
+			continue
+		} else if wb["secret"].(string) != d.Get("secret").(string) {
+			continue
+		} else {
+			d.SetId(wb["package_id"].(string))
+			break
+		}
+	}
+
+	if d.Get("id").(string) == "" {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Unable to create User Webhook",
+		})
+		return diags
+	}
 
 	return diags
 }
@@ -152,11 +184,63 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	var req *http.Request
-	var err error
+	resp := make([]map[string]interface{}, 0)
 
-	// always run
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	req, err := http.NewRequest("GET", "https://artifacthub.io/api/v1/webhooks/user", nil)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	req.Header.Add("X-API-KEY-ID", d.Get("api_key").(string))
+	req.Header.Add("X-API-KEY-SECRET", d.Get("api_key_secret").(string))
+
+	r, err := client.Do(req)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	defer r.Body.Close()
+
+	webhookData := make(map[string]any, 0)
+
+	err = json.NewDecoder(r.Body).Decode(&resp)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	for _, wb := range resp {
+		if wb["package_id"].(string) == d.Get("id").(string) {
+			webhookData = wb
+			break
+		}
+		if wb["name"].(string) != d.Get("string").(string) {
+			continue
+		} else if d.Get("url").(string) != "" && wb["url"].(string) != d.Get("url").(string) {
+			continue
+		} else if d.Get("secret").(string) != "" && wb["secret"].(string) != d.Get("secret").(string) {
+			continue
+		} else {
+			webhookData = wb
+			break
+		}
+	}
+
+	if webhookData["webhook_id"].(string) == "" {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Unable to retrieve User Webhook",
+		})
+		return diags
+	}
+
+	d.Set("name", webhookData["name"].(string))
+	d.Set("description", webhookData["description"].(string))
+	d.Set("url", webhookData["url"].(string))
+	d.Set("secret", webhookData["secret"].(string))
+	d.Set("content_type", webhookData["content_type"].(string))
+	d.Set("active", webhookData["active"].(int))
+	d.Set("event_kinds", webhookData["event_kinds"].([]int))
+	d.Set("packages", webhookData["packages"].([]map[string]string))
+	d.SetId(webhookData["webhook_id"].(string))
 
 	return diags
 }
@@ -170,8 +254,54 @@ func resourceUserWebhookUpdate(ctx context.Context, d *schema.ResourceData, m in
 	var req *http.Request
 	var err error
 
-	// always run
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	webhookData := map[string]any{
+		"name":         d.Get("name").(string),
+		"description":  d.Get("description").(string),
+		"url":          d.Get("url").(string),
+		"secret":       d.Get("secret").(string),
+		"content_type": d.Get("content_type").(string),
+		"active":       d.Get("active").(bool),
+		"event_kinds":  d.Get("event_kinds").([]int),
+		"packages":     d.Get("packages").([]map[string]string),
+	}
+
+	tpl := d.Get("template").(string)
+
+	if tpl != "" {
+		webhookData["template"] = tpl
+	}
+
+	data, _ := json.Marshal(webhookData)
+
+	req, err = http.NewRequest("POST", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user/"+d.Get("id").(string)), bytes.NewBuffer(data))
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	req.Header.Add("X-API-KEY-ID", d.Get("api_key").(string))
+	req.Header.Add("X-API-KEY-SECRET", d.Get("api_key_secret").(string))
+
+	r, err := client.Do(req)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	defer r.Body.Close()
+
+	resp := make(map[string]interface{}, 0)
+	err = json.NewDecoder(r.Body).Decode(&resp)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	if r.Status != "204" {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Unable to update User Webhook",
+			Detail:   fmt.Sprintf("status: %s message : %s", r.Status, resp["message"].(string)),
+		})
+		return diags
+	}
 
 	return diags
 }
@@ -185,8 +315,29 @@ func resourceUserWebhookDelete(ctx context.Context, d *schema.ResourceData, m in
 	var req *http.Request
 	var err error
 
-	// always run
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	req, err = http.NewRequest("POST", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user/"+d.Get("id").(string)), nil)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	req.Header.Add("X-API-KEY-ID", d.Get("api_key").(string))
+	req.Header.Add("X-API-KEY-SECRET", d.Get("api_key_secret").(string))
+
+	r, err := client.Do(req)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	if r.Status != "204" {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "The User Webhook could not be deleted",
+		})
+		return diags
+	}
+
+	d.SetId("")
 
 	return diags
 }
