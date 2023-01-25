@@ -24,49 +24,59 @@ func resourceUserWebhook() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Name of the webhook. ",
+				Required:    true,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "",
+				Type:        schema.TypeString,
+				Description: "Description for the webhook. ",
+				Optional:    true,
+				Default:     "",
 			},
 			"url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Webhook target url. ",
+				Required:    true,
 			},
 			"secret": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "",
+				Type:        schema.TypeString,
+				Description: "Webhook secret for basic authentication. ",
+				Optional:    true,
+				Default:     "",
 			},
 			"content_type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "application/json",
+				Type:        schema.TypeString,
+				Description: "Content Type of the webhook request body. ",
+				Optional:    true,
+				Default:     "application/json",
 			},
 			"template": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Template of the webhook request body. ",
+				Optional:    true,
 			},
 			"active": {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Description: "Status of the webhook. ",
+				Required:    true,
 			},
 			"event_kinds": {
-				Type:     schema.TypeList,
-				Required: true,
-				Elem:     schema.TypeInt,
+				Type:        schema.TypeList,
+				Description: "Event Kinds of the webhook. `0` for new package release, `1` for security alerts, `2` for Repository tracking errors, `4` for repository scanning errors. ",
+				Required:    true,
+				Elem:        schema.TypeInt,
 			},
 			"packages": {
-				Type:     schema.TypeList,
-				Required: true,
+				Type:        schema.TypeList,
+				Description: "Packages list",
+				Required:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"package_id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "package_id (can be recovered from a data source)",
+							Required:    true,
 						},
 					},
 				},
@@ -162,7 +172,7 @@ func resourceUserWebhookCreate(ctx context.Context, d *schema.ResourceData, m in
 		} else if wb["secret"].(string) != d.Get("secret").(string) {
 			continue
 		} else {
-			d.SetId(wb["package_id"].(string))
+			d.SetId(wb["webhook_id"].(string))
 			break
 		}
 	}
@@ -315,7 +325,7 @@ func resourceUserWebhookDelete(ctx context.Context, d *schema.ResourceData, m in
 	var req *http.Request
 	var err error
 
-	req, err = http.NewRequest("POST", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user/"+d.Get("id").(string)), nil)
+	req, err = http.NewRequest("DELETE", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user/"+d.Get("id").(string)), nil)
 
 	if err != nil {
 		return diag.FromErr(err)
