@@ -13,19 +13,25 @@ import (
 
 func dataSourceHelmPackage() *schema.Resource {
 	return &schema.Resource{
+
+		Description: "Helm Package data source",
+
 		ReadContext: dataSourceHelmPackageRead,
 		Schema: map[string]*schema.Schema{
 			"repo_name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Name of the repository where the package is located",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Name of the package. ",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"version": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Version of the package",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}
