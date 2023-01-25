@@ -11,6 +11,11 @@ func init() {
 	schema.DescriptionKind = schema.StringMarkdown
 }
 
+type Config struct {
+	ApiKey       string
+	ApiKeySecret string
+}
+
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -46,10 +51,17 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	apiKey := d.Get("api_key").(string)
 	apiKeySecret := d.Get("api_key_secret").(string)
 
-	out := map[string]string{
-		"apiKey":       apiKey,
-		"apiKeySecret": apiKeySecret,
+	if apiKey == "" || apiKeySecret == "" {
+		return nil, append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "No Credentials were provided",
+		})
 	}
 
-	return out, diags
+	config := Config{
+		ApiKey:       apiKey,
+		ApiKeySecret: apiKeySecret,
+	}
+
+	return &config, diags
 }
