@@ -3,12 +3,12 @@
 page_title: "artifacthub_helm_package Data Source - terraform-provider-artifacthub"
 subcategory: ""
 description: |-
-  
+  Helm Package data source
 ---
 
 # artifacthub_helm_package (Data Source)
 
-
+Helm Package data source
 
 
 
@@ -17,12 +17,12 @@ description: |-
 
 ### Required
 
-- `name` (String)
-- `repo_name` (String)
+- `name` (String) Name of the package.
+- `repo_name` (String) Name of the repository where the package is located
 
 ### Optional
 
-- `version` (String)
+- `version` (String) Version of the package
 
 ### Read-Only
 

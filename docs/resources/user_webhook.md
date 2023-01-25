@@ -17,18 +17,18 @@ description: |-
 
 ### Required
 
-- `active` (Boolean)
-- `event_kinds` (List of Number)
-- `name` (String)
-- `packages` (Block List, Min: 1) (see [below for nested schema](#nestedblock--packages))
-- `url` (String)
+- `active` (Boolean) Status of the webhook.
+- `event_kinds` (List of Number) Event Kinds of the webhook. `0` for new package release, `1` for security alerts, `2` for Repository tracking errors, `4` for repository scanning errors.
+- `name` (String) Name of the webhook.
+- `packages` (Block List, Min: 1) Packages list (see [below for nested schema](#nestedblock--packages))
+- `url` (String) Webhook target url.
 
 ### Optional
 
-- `content_type` (String)
-- `description` (String)
-- `secret` (String)
-- `template` (String)
+- `content_type` (String) Content Type of the webhook request body.
+- `description` (String) Description for the webhook.
+- `secret` (String) Webhook secret for basic authentication.
+- `template` (String) Template of the webhook request body.
 
 ### Read-Only
 
@@ -37,8 +37,8 @@ description: |-
 <a id="nestedblock--packages"></a>
 ### Nested Schema for `packages`
 
-Read-Only:
+Required:
 
-- `package_id` (String)
+- `package_id` (String) package_id (can be recovered from a data source)
 
 
