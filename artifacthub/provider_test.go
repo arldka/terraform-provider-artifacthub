@@ -54,7 +54,6 @@ func TestProviderConfigureFail(t *testing.T) {
 	apiKey := os.Getenv("ARTIFACTHUB_API_KEY")
 	apiKeySecret := os.Getenv("ARTIFACTHUB_API_KEY_SECRET")
 
-	os.Unsetenv("ARTIFACTHUB_API_KEY")
 	os.Unsetenv("ARTIFACTHUB_API_KEY_SECRET")
 
 	p := Provider()
@@ -62,8 +61,16 @@ func TestProviderConfigureFail(t *testing.T) {
 
 	diags := p.Configure(ctx, rc)
 
-	os.Setenv("ARTIFACTHUB_API_KEY", apiKey)
+	if !diags.HasError() {
+		t.Fatal(diags)
+	}
+
+	os.Unsetenv("ARTIFACTHUB_API_KEY")
 	os.Setenv("ARTIFACTHUB_API_KEY_SECRET", apiKeySecret)
+
+	diags = p.Configure(ctx, rc)
+
+	os.Setenv("ARTIFACTHUB_API_KEY", apiKey)
 
 	if !diags.HasError() {
 		t.Fatal(diags)
