@@ -242,14 +242,24 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
-	d.Set("name", webhookData["name"].(string))
-	d.Set("description", webhookData["description"].(string))
-	d.Set("url", webhookData["url"].(string))
-	d.Set("secret", webhookData["secret"].(string))
-	d.Set("content_type", webhookData["content_type"].(string))
-	d.Set("active", webhookData["active"].(int))
-	d.Set("event_kinds", webhookData["event_kinds"].([]int))
-	d.Set("packages", webhookData["packages"].([]map[string]string))
+	if err = d.Set("name", webhookData["name"].(string)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("description", webhookData["description"].(string)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("url", webhookData["url"].(string)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("secret", webhookData["secret"].(string)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("content_type", webhookData["content_type"].(string)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("active", webhookData["active"].(int)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("event_kinds", webhookData["event_kinds"].([]int)); err != nil {
+		return diag.FromErr(err)
+	} else if err = d.Set("packages", webhookData["packages"].([]map[string]string)); err != nil {
+		return diag.FromErr(err)
+	}
+
 	d.SetId(webhookData["webhook_id"].(string))
 
 	return diags
