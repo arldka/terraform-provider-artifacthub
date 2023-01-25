@@ -15,7 +15,7 @@ func TestAccArtifacthubDataSourceHelmPackage_basic(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.artifacthub_helm_package.test", "name", "artifact-hub"),
 					resource.TestCheckResourceAttr("data.artifacthub_helm_package.test", "repo_name", "artifact-hub"),
-					resource.TestCheckResourceAttr("data.artifacthub_helm_package.test", "package_id", "75ee6e00-b4d5-429e-9d82-33ab730081ff"),
+					resource.TestCheckResourceAttr("data.artifacthub_helm_package.test", "id", "75ee6e00-b4d5-429e-9d82-33ab730081ff"),
 				),
 			},
 		},
