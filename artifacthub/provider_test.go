@@ -47,3 +47,26 @@ func TestProviderConfigure(t *testing.T) {
 		t.Fatal(diags)
 	}
 }
+
+func TestProviderConfigureFail(t *testing.T) {
+	ctx := context.TODO()
+
+	apiKey := os.Getenv("ARTIFACTHUB_API_KEY")
+	apiKeySecret := os.Getenv("ARTIFACTHUB_API_KEY_SECRET")
+
+	os.Unsetenv("ARTIFACTHUB_API_KEY")
+	os.Unsetenv("ARTIFACTHUB_API_KEY_SECRET")
+
+	p := Provider()
+	rc := terraform.NewResourceConfigRaw(map[string]interface{}{})
+
+	diags := p.Configure(ctx, rc)
+
+	os.Setenv("ARTIFACTHUB_API_KEY", apiKey)
+	os.Setenv("ARTIFACTHUB_API_KEY_SECRET", apiKeySecret)
+
+	if !diags.HasError() {
+		t.Fatal(diags)
+	}
+
+}
