@@ -2,7 +2,7 @@ terraform {
   required_providers {
     artifacthub = {
       version = "0.1.0"
-      source   = "arldka.cloud/dev/artifacthub"
+      source  = "arldka.cloud/dev/artifacthub"
     }
   }
 }
