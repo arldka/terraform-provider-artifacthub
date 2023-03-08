@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -14,26 +13,25 @@ import (
 
 func dataSourceHelmPackage() *schema.Resource {
 	return &schema.Resource{
+
+		Description: "Helm Package data source",
+
 		ReadContext: dataSourceHelmPackageRead,
 		Schema: map[string]*schema.Schema{
 			"repo_name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Name of the repository where the package is located",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Name of the package. ",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"version": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-
-			// Computed Fields
-
-			"package_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Version of the package",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}
@@ -84,12 +82,15 @@ func dataSourceHelmPackageRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
-	if err := d.Set("package_id", pkg["package_id"]); err != nil {
-		return diag.FromErr(err)
+	if pkg["package_id"].(string) == "" {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Helm Package does not exist",
+		})
+		return diags
 	}
 
-	// always run
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	d.SetId(pkg["package_id"].(string))
 
 	return diags
 }
