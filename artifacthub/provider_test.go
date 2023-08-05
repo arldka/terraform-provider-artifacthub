@@ -32,6 +32,10 @@ func TestProvider_impl(t *testing.T) {
 
 func TestProviderConfigure(t *testing.T) {
 	ctx := context.TODO()
+
+	apiKey := os.Getenv("ARTIFACTHUB_API_KEY")
+	apiKeySecret := os.Getenv("ARTIFACTHUB_API_KEY_SECRET")
+
 	os.Setenv("ARTIFACTHUB_API_KEY", uuid.New().String())
 	os.Setenv("ARTIFACTHUB_API_KEY_SECRET", uuid.New().String())
 
@@ -46,6 +50,9 @@ func TestProviderConfigure(t *testing.T) {
 	if diags.HasError() {
 		t.Fatal(diags)
 	}
+
+	os.Setenv("ARTIFACTHUB_API_KEY_SECRET", apiKeySecret)
+	os.Setenv("ARTIFACTHUB_API_KEY", apiKey)
 }
 
 func TestProviderConfigureFail(t *testing.T) {
@@ -76,4 +83,13 @@ func TestProviderConfigureFail(t *testing.T) {
 		t.Fatal(diags)
 	}
 
+}
+
+func testAccPreCheck(t *testing.T) {
+	if err := os.Getenv("ARTIFACTHUB_API_KEY"); err == "" {
+		t.Fatal("ARTIFACTHUB_API_KEY must be set for acceptance tests")
+	}
+	if err := os.Getenv("ARTIFACTHUB_API_KEY_SECRET"); err == "" {
+		t.Fatal("ARTIFACTHUB_API_KEY_SECRET must be set for acceptance tests")
+	}
 }

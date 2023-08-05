@@ -65,7 +65,7 @@ func resourceUserWebhook() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Event Kinds of the webhook. `0` for new package release, `1` for security alerts, `2` for Repository tracking errors, `4` for repository scanning errors. ",
 				Required:    true,
-				Elem:        schema.TypeInt,
+				Elem:        &schema.Schema{Type: schema.TypeInt},
 			},
 			"packages": {
 				Type:        schema.TypeList,
@@ -100,8 +100,8 @@ func resourceUserWebhookCreate(ctx context.Context, d *schema.ResourceData, m in
 		"secret":       d.Get("secret").(string),
 		"content_type": d.Get("content_type").(string),
 		"active":       d.Get("active").(bool),
-		"event_kinds":  d.Get("event_kinds").([]int),
-		"packages":     d.Get("packages").([]map[string]string),
+		"event_kinds":  d.Get("event_kinds").([]interface{}),
+		"packages":     d.Get("packages").([]interface{}),
 	}
 
 	tpl := d.Get("template").(string)
@@ -110,9 +110,9 @@ func resourceUserWebhookCreate(ctx context.Context, d *schema.ResourceData, m in
 		webhookData["template"] = tpl
 	}
 
-	data, _ := json.Marshal(webhookData)
+	//data, _ := json.Marshal(webhookData)
 
-	req, err = http.NewRequest("POST", "https://artifacthub.io/api/v1/webhooks/user", bytes.NewBuffer(data))
+	//req, err = http.NewRequest("POST", "https://artifacthub.io/api/v1/webhooks/user", bytes.NewBuffer(data))
 
 	if err != nil {
 		return diag.FromErr(err)
