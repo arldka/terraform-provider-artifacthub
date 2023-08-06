@@ -20,6 +20,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.0
+
 // grpc/reflection/v1alpha/reflection.proto is a deprecated file.
 
 package grpc_reflection_v1alpha

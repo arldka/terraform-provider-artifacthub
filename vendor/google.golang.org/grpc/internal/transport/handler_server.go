@@ -160,6 +160,7 @@ func (ht *serverHandlerTransport) Close(err error) {
 	ht.closeOnce.Do(func() {
 		if ht.logger.V(logLevel) {
 			ht.logger.Infof("Closing: %v", err)
+
 		}
 		close(ht.closedCh)
 	})

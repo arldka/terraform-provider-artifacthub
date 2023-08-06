@@ -207,6 +207,7 @@ func parseServiceConfig(js string) *serviceconfig.ParseResult {
 			continue
 		}
 
+
 		mc := MethodConfig{
 			WaitForReady: m.WaitForReady,
 			Timeout:      (*time.Duration)(m.Timeout),

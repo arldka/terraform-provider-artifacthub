@@ -548,6 +548,7 @@ func (l *loopyWriter) run() (err error) {
 		}
 		l.cbuf.finish()
 	}()
+
 	for {
 		it, err := l.cbuf.get(true)
 		if err != nil {
@@ -776,6 +777,7 @@ func (l *loopyWriter) cleanupStreamHandler(c *cleanupStream) error {
 	}
 	if l.draining && len(l.estdStreams) == 0 {
 		// Flush and close the connection; we are done with it.
+
 		return errors.New("finished processing active streams while in draining mode")
 	}
 	return nil
@@ -812,6 +814,7 @@ func (l *loopyWriter) incomingGoAwayHandler(*incomingGoAway) error {
 		l.draining = true
 		if len(l.estdStreams) == 0 {
 			// Flush and close the connection; we are done with it.
+
 			return errors.New("received GOAWAY with no active streams")
 		}
 	}
@@ -828,6 +831,13 @@ func (l *loopyWriter) goAwayHandler(g *goAway) error {
 		l.draining = draining
 	}
 	return nil
+}
+
+func (l *loopyWriter) closeConnectionHandler() error {
+	// Exit loopyWriter entirely by returning an error here.  This will lead to
+	// the transport closing the connection, and, ultimately, transport
+	// closure.
+	return ErrConnClosing
 }
 
 func (l *loopyWriter) handle(i interface{}) error {
@@ -862,6 +872,7 @@ func (l *loopyWriter) handle(i interface{}) error {
 		// Just return a non-I/O error and run() will flush and close the
 		// connection.
 		return ErrConnClosing
+
 	default:
 		return fmt.Errorf("transport: unknown control message type %T", i)
 	}
