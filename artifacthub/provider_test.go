@@ -86,10 +86,10 @@ func TestProviderConfigureFail(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if err := os.Getenv("ARTIFACTHUB_API_KEY"); err == "" {
+	if v := os.Getenv("ARTIFACTHUB_API_KEY"); v == "" {
 		t.Fatal("ARTIFACTHUB_API_KEY must be set for acceptance tests")
 	}
-	if err := os.Getenv("ARTIFACTHUB_API_KEY_SECRET"); err == "" {
+	if v := os.Getenv("ARTIFACTHUB_API_KEY_SECRET"); v == "" {
 		t.Fatal("ARTIFACTHUB_API_KEY_SECRET must be set for acceptance tests")
 	}
 }
