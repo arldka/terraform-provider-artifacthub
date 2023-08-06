@@ -62,14 +62,16 @@ func dataSourceHelmPackageRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
+	// Configures the HTTP request header
 	req.Header.Add("accept", "application/json")
+	req.Header.Set("X-API-KEY-ID", m.(*Config).ApiKey)
+	req.Header.Set("X-API-KEY-SECRET", m.(*Config).ApiKeySecret)
 
 	r, err := client.Do(req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	defer r.Body.Close()
-
 	pkg := make(map[string]interface{}, 0)
 	err = json.NewDecoder(r.Body).Decode(&pkg)
 	if err != nil {

@@ -17,10 +17,9 @@ func TestAccArtifacthubResourceUserWebhookCreate(t *testing.T) {
 			{
 				Config: testAccArtifacthubResourceUserWebhookCreateSinglePackage(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("artifacthub_user_webhook.test", "name", "testSinglePackage"),
-					resource.TestCheckResourceAttr("artifacthub_user_webhook.test", "description", "test"),
-					resource.TestCheckResourceAttr("artifacthub_user_webhook.test", "url", "https://test.com"),
-					resource.TestCheckResourceAttr("artifacthub_user_webhook.test", "packages.#", "1"),
+					resource.TestCheckResourceAttr("artifacthub_user_webhook.test_single_package", "name", "testSinglePackage"),
+					resource.TestCheckResourceAttr("artifacthub_user_webhook.test_single_package", "description", "test"),
+					resource.TestCheckResourceAttr("artifacthub_user_webhook.test_single_package", "url", "https://test.com"),
 				),
 			},
 		},
@@ -33,9 +32,7 @@ func testAccArtifacthubResourceUserWebhookCreateSinglePackage() string {
 		name = "testSinglePackage"
 		description = "test"
 		url = "https://test.com"
-		packages {
-			package_id = "75ee6e00-b4d5-429e-9d82-33ab730081ff"
-		}
+		packages = ["75ee6e00-b4d5-429e-9d82-33ab730081ff"]
 		event_kinds = [0]
 		active = false
 	}

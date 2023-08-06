@@ -1,0 +1,5 @@
+output: artifacthub.gen.go
+package: artifacthub
+generate:
+  - types
+  - client

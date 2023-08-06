@@ -20,6 +20,7 @@ variable "name" {
 data "artifacthub_helm_package" "default" {
   repo_name = var.repo_name
   name      = var.name
+  version   = "v1.1.1"
 }
 
 # Returns the package_id
