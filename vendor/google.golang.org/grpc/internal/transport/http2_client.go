@@ -39,7 +39,6 @@ import (
 	"google.golang.org/grpc/internal/channelz"
 	icredentials "google.golang.org/grpc/internal/credentials"
 	"google.golang.org/grpc/internal/grpclog"
-
 	"google.golang.org/grpc/internal/grpcsync"
 	"google.golang.org/grpc/internal/grpcutil"
 	imetadata "google.golang.org/grpc/internal/metadata"
@@ -248,7 +247,6 @@ func newHTTP2Client(connectCtx, ctx context.Context, addr resolver.Address, opts
 			// connectCtx expired before exiting the function.  Hard close the connection.
 			if logger.V(logLevel) {
 				logger.Infof("Aborting due to connect deadline expiring: %v", err)
-
 			}
 			conn.Close()
 		}
@@ -451,7 +449,6 @@ func newHTTP2Client(connectCtx, ctx context.Context, addr resolver.Address, opts
 	go func() {
 		t.loopy = newLoopyWriter(clientSide, t.framer, t.controlBuf, t.bdpEst, t.conn, t.logger)
 		t.loopy.run()
-
 		close(t.writerDone)
 	}()
 	return t, nil
@@ -867,7 +864,6 @@ func (t *http2Client) NewStream(ctx context.Context, callHdr *CallHdr) (*Stream,
 	if transportDrainRequired {
 		if t.logger.V(logLevel) {
 			t.logger.Infof("Draining transport: t.nextID > MaxStreamID")
-
 		}
 		t.GracefulClose()
 	}
@@ -961,7 +957,6 @@ func (t *http2Client) Close(err error) {
 	}
 	if t.logger.V(logLevel) {
 		t.logger.Infof("Closing: %v", err)
-
 	}
 	// Call t.onClose ASAP to prevent the client from attempting to create new
 	// streams.
@@ -1019,7 +1014,6 @@ func (t *http2Client) GracefulClose() {
 	}
 	if t.logger.V(logLevel) {
 		t.logger.Infof("GracefulClose called")
-
 	}
 	t.onClose(GoAwayInvalid)
 	t.state = draining
@@ -1185,7 +1179,6 @@ func (t *http2Client) handleRSTStream(f *http2.RSTStreamFrame) {
 	if !ok {
 		if t.logger.V(logLevel) {
 			t.logger.Infof("Received a RST_STREAM frame with code %q, but found no mapped gRPC status", f.ErrCode)
-
 		}
 		statusCode = codes.Unknown
 	}

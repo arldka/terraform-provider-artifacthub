@@ -1416,7 +1416,6 @@ func (ac *addrConn) createTransport(ctx context.Context, addr resolver.Address, 
 	addr.ServerName = ac.cc.getServerName(addr)
 	hctx, hcancel := context.WithCancel(ctx)
 
-
 	onClose := func(r transport.GoAwayReason) {
 		ac.mu.Lock()
 		defer ac.mu.Unlock()
@@ -1427,7 +1426,6 @@ func (ac *addrConn) createTransport(ctx context.Context, addr resolver.Address, 
 			// updateAddrs() already cleared the transport and canceled hctx
 			// via ac.ctx, and we expected this connection to be closed, so do
 			// nothing here.
-
 			return
 		}
 		hcancel()
@@ -1464,7 +1462,6 @@ func (ac *addrConn) createTransport(ctx context.Context, addr resolver.Address, 
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 	if ctx.Err() != nil {
-
 		// This can happen if the subConn was removed while in `Connecting`
 		// state. tearDown() would have set the state to `Shutdown`, but
 		// would not have closed the transport since ac.transport would not

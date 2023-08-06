@@ -488,7 +488,6 @@ func (a *csAttempt) newStream() error {
 		// of AppendToOutgoingContext() that accepts a metadata.MD.
 		md, _ := metadata.FromOutgoingContext(a.ctx)
 		md = metadata.Join(md, a.pickResult.Metadata)
-
 		a.ctx = metadata.NewOutgoingContext(a.ctx, md)
 	}
 

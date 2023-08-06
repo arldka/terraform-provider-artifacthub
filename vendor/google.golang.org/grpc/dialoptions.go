@@ -46,7 +46,6 @@ func init() {
 	internal.WithBinaryLogger = withBinaryLogger
 	internal.JoinDialOptions = newJoinDialOption
 	internal.DisableGlobalDialOptions = newDisableGlobalDialOptions
-
 }
 
 // dialOptions configure a Dial call. dialOptions are set by the DialOption

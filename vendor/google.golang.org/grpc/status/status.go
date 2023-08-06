@@ -80,7 +80,6 @@ func FromProto(s *spb.Status) *Status {
 //     *Status`, or if err wraps a type satisfying this, the appropriate Status is
 //     returned.  For wrapped errors, the message returned contains the entire
 //     err.Error() text and not just the wrapped status.
-
 //
 //   - If err is nil, a Status is returned with codes.OK and no message.
 //

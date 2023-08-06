@@ -65,7 +65,6 @@ var (
 	// DNS cluster is enabled, which can be disabled by setting the environment
 	// variable "GRPC_XDS_EXPERIMENTAL_ENABLE_AGGREGATE_AND_LOGICAL_DNS_CLUSTER"
 	// to "false".
-
 	XDSAggregateAndDNS = boolFromEnv("GRPC_XDS_EXPERIMENTAL_ENABLE_AGGREGATE_AND_LOGICAL_DNS_CLUSTER", true)
 
 	// XDSRBAC indicates whether xDS configured RBAC HTTP Filter is enabled,
@@ -81,7 +80,6 @@ var (
 	// "GRPC_EXPERIMENTAL_XDS_FEDERATION" to "true".
 	XDSFederation = boolFromEnv("GRPC_EXPERIMENTAL_XDS_FEDERATION", true)
 
-
 	// XDSRLS indicates whether processing of Cluster Specifier plugins and
 	// support for the RLS CLuster Specifier is enabled, which can be disabled by
 	// setting the environment variable "GRPC_EXPERIMENTAL_XDS_RLS_LB" to
@@ -94,5 +92,4 @@ var (
 	// can be disabled by setting the environment variable
 	// "GRPC_EXPERIMENTAL_XDS_CUSTOM_LB_CONFIG" to "false".
 	XDSCustomLBPolicy = boolFromEnv("GRPC_EXPERIMENTAL_XDS_CUSTOM_LB_CONFIG", true)
-
 )

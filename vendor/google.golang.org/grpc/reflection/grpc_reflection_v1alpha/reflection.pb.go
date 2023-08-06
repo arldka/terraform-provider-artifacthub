@@ -20,7 +20,6 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.22.0
-
 // grpc/reflection/v1alpha/reflection.proto is a deprecated file.
 
 package grpc_reflection_v1alpha
@@ -407,7 +406,6 @@ type ServerReflectionResponse_AllExtensionNumbersResponse struct {
 	// This message is used to answer all_extension_numbers_of_type requst.
 	//
 	// Deprecated: The entire proto file grpc/reflection/v1alpha/reflection.proto is marked as deprecated.
-
 	AllExtensionNumbersResponse *ExtensionNumberResponse `protobuf:"bytes,5,opt,name=all_extension_numbers_response,json=allExtensionNumbersResponse,proto3,oneof"`
 }
 
@@ -415,7 +413,6 @@ type ServerReflectionResponse_ListServicesResponse struct {
 	// This message is used to answer list_services request.
 	//
 	// Deprecated: The entire proto file grpc/reflection/v1alpha/reflection.proto is marked as deprecated.
-
 	ListServicesResponse *ListServiceResponse `protobuf:"bytes,6,opt,name=list_services_response,json=listServicesResponse,proto3,oneof"`
 }
 

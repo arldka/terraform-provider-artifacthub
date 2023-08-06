@@ -40,7 +40,6 @@ var (
 	// pick_first LB policy, which can be enabled by setting the environment
 	// variable "GRPC_EXPERIMENTAL_PICKFIRST_LB_CONFIG" to "true".
 	PickFirstLBConfig = boolFromEnv("GRPC_EXPERIMENTAL_PICKFIRST_LB_CONFIG", false)
-
 )
 
 func boolFromEnv(envVar string, def bool) bool {

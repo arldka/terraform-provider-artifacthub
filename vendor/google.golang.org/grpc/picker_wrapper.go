@@ -70,7 +70,6 @@ func (pw *pickerWrapper) updatePicker(p balancer.Picker) {
 //     done function.
 func doneChannelzWrapper(acbw *acBalancerWrapper, result *balancer.PickResult) {
 	ac := acbw.ac
-
 	ac.incrCallsStarted()
 	done := result.Done
 	result.Done = func(b balancer.DoneInfo) {
@@ -164,7 +163,6 @@ func (pw *pickerWrapper) pick(ctx context.Context, failfast bool, info balancer.
 		if t := acbw.ac.getReadyTransport(); t != nil {
 			if channelz.IsOn() {
 				doneChannelzWrapper(acbw, &pickResult)
-
 				return t, pickResult, nil
 			}
 			return t, pickResult, nil

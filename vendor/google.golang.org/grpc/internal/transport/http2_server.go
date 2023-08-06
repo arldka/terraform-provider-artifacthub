@@ -339,7 +339,6 @@ func NewServerTransport(conn net.Conn, config *ServerConfig) (_ ServerTransport,
 		t.loopy = newLoopyWriter(serverSide, t.framer, t.controlBuf, t.bdpEst, t.conn, t.logger)
 		t.loopy.ssGoAwayHandler = t.outgoingGoAwayHandler
 		t.loopy.run()
-
 		close(t.writerDone)
 	}()
 	go t.keepalive()
@@ -385,7 +384,6 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
 		isGRPC      = false
 		contentType = ""
 		mdata       = make(metadata.MD, len(frame.Fields))
-
 		httpMethod  string
 		// these are set if an error is encountered while parsing the headers
 		protocolError bool
@@ -444,7 +442,6 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
 			if err != nil {
 				headerError = status.Newf(codes.Internal, "malformed binary metadata %q in header %q: %v", hf.Value, hf.Name, err)
 				t.logger.Warningf("Failed to decode metadata header (%q, %q): %v", hf.Name, hf.Value, err)
-
 				break
 			}
 			mdata[hf.Name] = append(mdata[hf.Name], v)
@@ -1233,7 +1230,6 @@ func (t *http2Server) Close(err error) {
 	}
 	if t.logger.V(logLevel) {
 		t.logger.Infof("Closing: %v", err)
-
 	}
 	t.state = closing
 	streams := t.activeStreams
@@ -1330,7 +1326,6 @@ func (t *http2Server) Drain(debugData string) {
 	}
 	t.drainEvent = grpcsync.NewEvent()
 	t.controlBuf.put(&goAway{code: http2.ErrCodeNo, debugData: []byte(debugData), headsUp: true})
-
 }
 
 var goAwayPing = &ping{data: [8]byte{1, 6, 1, 8, 0, 3, 3, 9}}
@@ -1360,7 +1355,6 @@ func (t *http2Server) outgoingGoAwayHandler(g *goAway) (bool, error) {
 			return false, err
 		}
 		if retErr != nil {
-
 			return false, retErr
 		}
 		return true, nil
