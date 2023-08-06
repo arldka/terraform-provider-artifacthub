@@ -284,7 +284,9 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 		k := kind.(float64)
 		eventKinds = append(eventKinds, k)
 	}
-	d.Set("event_kinds", eventKinds)
+	if err = d.Set("event_kinds", eventKinds); err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Defines the webhook packages
 	rawPackages := webhookData["packages"].([]interface{})
@@ -294,7 +296,9 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 		p := pm["package_id"].(string)
 		packages = append(packages, p)
 	}
-	d.Set("packages", packages)
+	if err = d.Set("packages", packages); err != nil {
+		return diag.FromErr(err)
+	}
 
 	if webhookData["template"] != nil {
 		if err = d.Set("template", webhookData["template"].(string)); err != nil {
