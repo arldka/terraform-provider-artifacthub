@@ -218,8 +218,6 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	fmt.Fprintln(os.Stdout, "start of read")
-
 	resp := make([]map[string]interface{}, 0)
 
 	req, err := http.NewRequest("GET", "https://artifacthub.io/api/v1/webhooks/user", nil)

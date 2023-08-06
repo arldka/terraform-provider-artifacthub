@@ -84,10 +84,10 @@ func dataSourceHelmPackageRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
-	if pkg["package_id"].(string) == "" {
+	if pkg["package_id"] == nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Helm Package does not exist",
+			Summary:  "Helm Package not found",
 		})
 		return diags
 	}
