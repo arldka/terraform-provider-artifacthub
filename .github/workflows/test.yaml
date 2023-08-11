@@ -40,6 +40,7 @@ jobs:
           apt: curl jq
       - name: Run Acceptance Test Suite
         run: |
+          export ARTIFACT_HUB_VERSION=$(curl -X 'GET' 'https://artifacthub.io/api/v1/packages/coredns/artifact-hub/artifact-hub' -H 'accept: application/json' | jq -r '.version')
           make testacc
         env:
           ARTIFACTHUB_API_KEY_SECRET: ${{ secrets.ARTIFACTHUB_API_KEY_SECRET }}
