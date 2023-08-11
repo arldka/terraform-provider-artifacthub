@@ -137,9 +137,9 @@ func TestDataSourceHelmPackageRead(t *testing.T) {
 			m := &Config{os.Getenv("ARTIFACTHUB_API_KEY"), os.Getenv("ARTIFACTHUB_API_KEY_SECRET")}
 			err := dataSourceHelmPackageRead(ctx, rd, m)
 			if tc.wantErr {
-				assert.Error(t, err)
+				assert.NotNil(t, err)
 			} else {
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 			}
 			for k, v := range tc.expected {
 				assert.Equal(t, v, rd.Get(k))
