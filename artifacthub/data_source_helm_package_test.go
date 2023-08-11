@@ -2,10 +2,12 @@ package artifacthub
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"regexp"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
@@ -102,7 +104,9 @@ func TestDataSourceHelmPackageRead(t *testing.T) {
 				"name":      "artifact-hub",
 			},
 			expected: map[string]interface{}{
-				"version": "1.1.1",
+				"repo_name": "artifact-hub",
+				"name":      "artifact-hub",
+				"version":   os.Getenv("ARTIFACT_HUB_VERSION"),
 			},
 			wantErr: false,
 		},
@@ -114,7 +118,9 @@ func TestDataSourceHelmPackageRead(t *testing.T) {
 				"version":   "1.1.1",
 			},
 			expected: map[string]interface{}{
-				"version": "1.1.1",
+				"repo_name": "artifact-hub",
+				"name":      "artifact-hub",
+				"version":   "1.1.1",
 			},
 			wantErr: false,
 		},
@@ -137,9 +143,10 @@ func TestDataSourceHelmPackageRead(t *testing.T) {
 			m := &Config{os.Getenv("ARTIFACTHUB_API_KEY"), os.Getenv("ARTIFACTHUB_API_KEY_SECRET")}
 			err := dataSourceHelmPackageRead(ctx, rd, m)
 			if tc.wantErr {
-				assert.NotNil(t, err)
+				fmt.Fprintln(os.Stdout, err)
+				assert.NotEqual(t, err, diag.Diagnostics(diag.Diagnostics(nil)))
 			} else {
-				assert.Nil(t, err)
+				assert.Equal(t, err, diag.Diagnostics(diag.Diagnostics(nil)))
 			}
 			for k, v := range tc.expected {
 				assert.Equal(t, v, rd.Get(k))
