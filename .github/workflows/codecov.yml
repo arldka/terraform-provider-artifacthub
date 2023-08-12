@@ -34,6 +34,7 @@ jobs:
         run: |
           export ARTIFACT_HUB_VERSION=$(curl -X 'GET' 'https://artifacthub.io/api/v1/packages/coredns/artifact-hub/artifact-hub' -H 'accept: application/json' | jq -r '.version')
           echo $ARTIFACT_HUB_VERSION
+          go version
           go test ./artifacthub -race -coverprofile=coverage.txt -covermode=atomic
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
