@@ -22,6 +22,8 @@ jobs:
         with:
           version: v1.54.1
           only-new-issues: true
+          args:
+            --timeout=30m
   acceptance_tests:
     runs-on: ubuntu-latest
     steps:
