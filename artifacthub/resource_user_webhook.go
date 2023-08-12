@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -242,11 +241,11 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	for _, wb := range resp {
-		if wb["webhook_id"].(string) == d.Id() {
+		if d.Id() != "" && wb["webhook_id"].(string) == d.Id() {
 			webhookData = wb
 			break
 		}
-		if wb["name"].(string) != d.Get("string").(string) {
+		if wb["name"].(string) != d.Get("name").(string) {
 			continue
 		} else {
 			webhookData = wb
@@ -315,7 +314,6 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 			return diag.FromErr(err)
 		}
 	}
-
 	d.SetId(webhookData["webhook_id"].(string))
 
 	return diags
@@ -324,8 +322,6 @@ func resourceUserWebhookRead(ctx context.Context, d *schema.ResourceData, m inte
 func resourceUserWebhookUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := &http.Client{Timeout: 10 * time.Second}
 
-	fmt.Fprintln(os.Stdout, "Start of Update")
-
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
@@ -333,32 +329,66 @@ func resourceUserWebhookUpdate(ctx context.Context, d *schema.ResourceData, m in
 	var err error
 
 	webhookData := map[string]any{
-		"name":         d.Get("name").(string),
-		"description":  d.Get("description").(string),
-		"url":          d.Get("url").(string),
-		"secret":       d.Get("secret").(string),
-		"content_type": d.Get("content_type").(string),
-		"active":       d.Get("active").(bool),
-		"event_kinds":  d.Get("event_kinds").([]int),
-		"packages":     d.Get("packages").([]map[string]string),
+		"name": d.Get("name").(string),
+		//		"description": d.Get("description").(string),
+		"url": d.Get("url").(string),
+		//		"secret":      d.Get("secret").(string),
+		//		"content_type": d.Get("content_type").(string),
+		"active": d.Get("active").(bool),
+		//		"event_kinds":  d.Get("event_kinds").([]int),
+		//		"packages":     d.Get("packages").([]map[string]string),
 	}
 
-	tpl := d.Get("template").(string)
+	// Defines the webhook event kinds
+	rawEventKinds := d.Get("event_kinds").([]interface{})
+	var eventKinds []int
+	for _, kind := range rawEventKinds {
+		k := kind.(int)
+		eventKinds = append(eventKinds, k)
+	}
+	webhookData["event_kinds"] = eventKinds
 
-	if tpl != "" {
-		webhookData["template"] = tpl
+	// Defines the webhook packages
+	rawPackages := d.Get("packages").([]interface{})
+	var packages []map[string]string
+	for _, pkg := range rawPackages {
+		p := map[string]string{
+			"package_id": pkg.(string),
+		}
+		packages = append(packages, p)
+	}
+	webhookData["packages"] = packages
+
+	// Defines the webhook description
+	if d.Get("description").(string) != "" {
+		webhookData["description"] = d.Get("description").(string)
+	}
+
+	// Defines the webhook secret
+	if d.Get("secret").(string) != "" {
+		webhookData["secret"] = d.Get("secret").(string)
+	}
+
+	// Defines the webhook content type
+	if d.Get("content_type").(string) != "" {
+		webhookData["content_type"] = d.Get("content_type").(string)
+	}
+
+	// Defines the webhook template
+	if d.Get("template").(string) != "" {
+		webhookData["template"] = d.Get("template").(string)
 	}
 
 	data, _ := json.Marshal(webhookData)
 
-	req, err = http.NewRequest("POST", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user/"+d.Get("id").(string)), bytes.NewBuffer(data))
+	req, err = http.NewRequest("PUT", fmt.Sprintf("https://artifacthub.io/api/v1/webhooks/user/"+d.Id()), bytes.NewBuffer(data))
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	req.Header.Add("X-API-KEY-ID", d.Get("api_key").(string))
-	req.Header.Add("X-API-KEY-SECRET", d.Get("api_key_secret").(string))
+	req.Header.Add("X-API-KEY-ID", m.(*Config).ApiKey)
+	req.Header.Add("X-API-KEY-SECRET", m.(*Config).ApiKeySecret)
 
 	r, err := client.Do(req)
 	if err != nil {
@@ -366,17 +396,11 @@ func resourceUserWebhookUpdate(ctx context.Context, d *schema.ResourceData, m in
 	}
 	defer r.Body.Close()
 
-	resp := make(map[string]interface{}, 0)
-	err = json.NewDecoder(r.Body).Decode(&resp)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	if r.Status != "204" {
+	if r.StatusCode != 204 {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Unable to update User Webhook",
-			Detail:   fmt.Sprintf("status: %s message : %s", r.Status, resp["message"].(string)),
+			Detail:   fmt.Sprintf("status: %s", r.Status),
 		})
 		return diags
 	}
