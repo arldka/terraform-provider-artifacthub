@@ -112,6 +112,9 @@ func TestResourceUserWebhookCreateReadDelete(t *testing.T) {
 			ctx := context.Background()
 			rr := schema.TestResourceDataRaw(t, r.Schema, tc.input)
 			m := &Config{os.Getenv("ARTIFACTHUB_API_KEY"), os.Getenv("ARTIFACTHUB_API_KEY_SECRET")}
+			fmt.Fprintf(os.Stdout, "m: %v\n", m)
+			fmt.Fprintf(os.Stdout, "rr: %v\n", rr)
+			fmt.Fprintf(os.Stdout, "tc: %v\n", tc)
 			if tc.action == "create" {
 				err := resourceUserWebhookCreate(ctx, rr, m)
 				if tc.wantErr {
