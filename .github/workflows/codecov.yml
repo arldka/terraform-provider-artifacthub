@@ -36,5 +36,8 @@ jobs:
           echo $ARTIFACT_HUB_VERSION
           go version
           go test ./artifacthub -coverprofile=coverage.txt -covermode=atomic
+        env:
+          ARTIFACTHUB_API_KEY_SECRET: ${{ secrets.ARTIFACTHUB_API_KEY_SECRET }}
+          ARTIFACTHUB_API_KEY: ${{ secrets.ARTIFACTHUB_API_KEY }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
