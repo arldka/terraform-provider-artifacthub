@@ -34,7 +34,7 @@ func Provider() *schema.Provider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"artifacthub_user_webhook": resourceUserWebhook(),
-			//			"artifacthub_org_webhook":  resourceOrgWebhook(),
+			"artifacthub_org_webhook":  resourceOrgWebhook(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"artifacthub_helm_package": dataSourceHelmPackage(),
