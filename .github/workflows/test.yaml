@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  golangci-lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.20'
+          cache: false
+      - uses: actions/checkout@v3
+      - uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54.1
+          only-new-issues: true
+          args:
+            --timeout=30m
+  acceptance_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read go-version
+        id: go-version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.go-version
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ steps.go-version.outputs.content }}
+      - name: Install cURL Package
+        uses: ConorMacBride/install-package@v1.1.0
+        with:
+          apt: curl jq
+      - name: Run Acceptance Test Suite
+        run: |
+          export ARTIFACT_HUB_VERSION=$(curl -X 'GET' 'https://artifacthub.io/api/v1/packages/coredns/artifact-hub/artifact-hub' -H 'accept: application/json' | jq -r '.version')
+          make testacc
+        env:
+          ARTIFACTHUB_API_KEY_SECRET: ${{ secrets.ARTIFACTHUB_API_KEY_SECRET }}
+          ARTIFACTHUB_API_KEY: ${{ secrets.ARTIFACTHUB_API_KEY }}
