@@ -21,7 +21,7 @@ description: |-
 - `event_kinds` (List of Number) Event Kinds of the webhook. `0` for new package release, `1` for security alerts, `2` for Repository tracking errors, `4` for repository scanning errors.
 - `name` (String) Name of the webhook.
 - `org_name` (String) Name of the organization.
-- `packages` (Block List, Min: 1) Packages list (see [below for nested schema](#nestedblock--packages))
+- `packages` (List of String) Packages list
 - `url` (String) Webhook target url.
 
 ### Optional
@@ -34,12 +34,5 @@ description: |-
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-
-<a id="nestedblock--packages"></a>
-### Nested Schema for `packages`
-
-Required:
-
-- `package_id` (String) package_id (can be recovered from a data source).
 
 
